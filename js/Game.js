@@ -1,5 +1,7 @@
 class Game {
-  constructor(){}
+  constructor() {
+
+  }
   
   getState(){
     var gameStateRef  = database.ref('gameState');
@@ -15,12 +17,50 @@ class Game {
     });
   }
 
-  start(){
+  async start(){
     if(gameState === 0){
       player = new Player();
-      player.getCount();
+      var playerCountRef = await database.ref("playerCount").once("value");
+
+      if (playerCountRef.exists()) {
+        playerCount = playerCountRef.val();
+
+        player.getCount();
+      }
+
       form = new Form()
       form.display();
+    }
+  }
+
+  play() {
+    form.hide();
+
+    textSize(40);
+    text("GAME START", 200, 200);
+    
+    Player.getPlyInfo();
+
+    if (allplayers !== undefined) {
+      var displayPosition = 130;
+      displayPosition += 20;
+
+      for (var plr in allplayers) {
+        if (plr === "player" + player.index) {
+          fill("red");
+        } else {
+          fill("black");
+        }
+      
+
+        textSize(25);
+        text(allplayers[plr].name + ":" + " " + allplayers[plr].distance, 130, displayPosition);
+      }
+    }
+
+    if (keyIsDown(UP_ARROW) && player.index !== null) {
+      player.distance += 100;
+      player.update();
     }
   }
 }
